@@ -14,7 +14,7 @@
         <logback_version>1.2.3</logback_version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <kotlin.compiler.incremental>true</kotlin.compiler.incremental>
-        <main.class>xyz.thetbw.ApplicationKt</main.class>
+        <main.class>xyz.thetbw.monitor.jdbc.ApplicationKt</main.class>
         <serialization.version>1.2.2</serialization.version>
     </properties>
 
