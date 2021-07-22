@@ -6,25 +6,30 @@
 
     <groupId>xyz.thetbw</groupId>
     <artifactId>monitor-agent</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>0.0.1</version>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <kotlin.version>1.5.0</kotlin.version>
-        <ktor_version>1.6.1</ktor_version>
+        <serialization.version>1.2.2</serialization.version>
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>org.jetbrains.kotlinx</groupId>
+            <artifactId>kotlinx-serialization-json</artifactId>
+            <version>${serialization.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.java-websocket</groupId>
             <artifactId>Java-WebSocket</artifactId>
             <version>1.5.1</version>
         </dependency>
         <dependency>
-            <groupId>io.ktor</groupId>
-            <artifactId>ktor-jackson</artifactId>
-            <version>${ktor_version}</version>
+            <groupId>org.javassist</groupId>
+            <artifactId>javassist</artifactId>
+            <version>3.28.0-GA</version>
         </dependency>
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
@@ -48,19 +53,16 @@
             <version>1.12.5</version>
         </dependency>
         <dependency>
-            <groupId>io.ktor</groupId>
-            <artifactId>ktor-client-core-jvm</artifactId>
-            <version>1.6.1</version>
-            <scope>compile</scope>
+            <groupId>org.jetbrains.kotlinx</groupId>
+            <artifactId>kotlinx-coroutines-core</artifactId>
+            <version>1.4.2</version>
         </dependency>
         <dependency>
-            <groupId>io.ktor</groupId>
-            <artifactId>ktor-client-cio-jvm</artifactId>
-            <version>1.6.1</version>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-stdlib</artifactId>
+            <version>${kotlin.version}</version>
             <scope>compile</scope>
         </dependency>
-
-
     </dependencies>
 
 
@@ -71,7 +73,13 @@
             <plugin>
                 <groupId>org.jetbrains.kotlin</groupId>
                 <artifactId>kotlin-maven-plugin</artifactId>
-
+                <version>${kotlin.version}</version>
+                <configuration>
+                    <jvmTarget>1.8</jvmTarget>
+                    <compilerPlugins>
+                        <plugin>kotlinx-serialization</plugin>
+                    </compilerPlugins>
+                </configuration>
                 <executions>
                     <execution>
                         <id>compile</id>
@@ -79,13 +87,14 @@
                             <goal>compile</goal>
                         </goals>
                     </execution>
-                    <execution>
-                        <id>test-compile</id>
-                        <goals>
-                            <goal>test-compile</goal>
-                        </goals>
-                    </execution>
                 </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.jetbrains.kotlin</groupId>
+                        <artifactId>kotlin-maven-serialization</artifactId>
+                        <version>${kotlin.version}</version>
+                    </dependency>
+                </dependencies>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -100,6 +109,8 @@
                             <addClasspath>true</addClasspath>
                         </manifest>
                         <manifestEntries>
+                            <Can-Retransform-Classes>true</Can-Retransform-Classes>
+                            <Can-Redefine-Classes>true</Can-Redefine-Classes>
                             <Agent-Class>xyz.thetbw.monitor.jdbc.agent.MainAgentKt</Agent-Class>
                         </manifestEntries>
                     </archive>
@@ -114,28 +125,6 @@
                     </execution>
                 </executions>
             </plugin>
-
-            <!--  打包时包含git信息          -->
-<!--            <plugin>-->
-<!--                <groupId>pl.project13.maven</groupId>-->
-<!--                <artifactId>git-commit-id-plugin</artifactId>-->
-<!--                <version>4.0.5</version>-->
-<!--                <executions>-->
-<!--                    <execution>-->
-<!--                        <id>get-the-git-infos</id>-->
-<!--                        <goals>-->
-<!--                            <goal>revision</goal>-->
-<!--                        </goals>-->
-<!--                        <phase>initialize</phase>-->
-<!--                    </execution>-->
-<!--                </executions>-->
-<!--                <configuration>-->
-<!--                    <dateFormat>yyyy-MM-dd HH:mm:ss</dateFormat>-->
-<!--                    <generateGitPropertiesFile>true</generateGitPropertiesFile>-->
-<!--                    <generateGitPropertiesFilename>${project.build.outputDirectory}/git.properties</generateGitPropertiesFilename>-->
-<!--                    <commitIdGenerationMode>full</commitIdGenerationMode>-->
-<!--                </configuration>-->
-<!--            </plugin>-->
         </plugins>
     </build>
 

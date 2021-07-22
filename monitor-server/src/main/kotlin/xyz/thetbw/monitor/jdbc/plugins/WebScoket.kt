@@ -9,7 +9,7 @@ fun Application.configureWebSocket(){
     install(WebSockets) {
         pingPeriod = Duration.ofSeconds(60) // Disabled (null) by default
         timeout = Duration.ofSeconds(15)
-        maxFrameSize = kotlin.Long.MAX_VALUE // Disabled (max value). The connection will be closed if surpassed this length.
+        maxFrameSize = Long.MAX_VALUE // Disabled (max value). The connection will be closed if surpassed this length.
         masking = false
     }
 

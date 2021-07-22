@@ -1,7 +1,13 @@
 package xyz.thetbw.monitor.jdbc
 
-import com.fasterxml.jackson.databind.ObjectMapper
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
-fun Any.toJson() = ObjectMapper().writeValueAsString(this)
+inline fun <reified T> T.toJson() = Json.encodeToString(this)
 
-fun <T> String.fromJson(type: Class<T>) = ObjectMapper().readValue(this,type)
+inline fun <reified T> String.fromJson() = Json.decodeFromString<T>(this)
+
+fun error(msg: String){
+    throw RuntimeException(msg)
+}

@@ -27,7 +27,7 @@ out/
 # mpeltonen/sbt-idea plugin
 .idea_modules/
 
-
+static/
 
 
 .metadata

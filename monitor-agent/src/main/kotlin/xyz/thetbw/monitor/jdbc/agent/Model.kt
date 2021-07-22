@@ -1,18 +1,11 @@
 package xyz.thetbw.monitor.jdbc.agent
 
-/**
- * java进程描述
- */
-data class JavaProcess(
-    val pid: String, //进程pid
-    val name: String, //进程名称
-    val fullName: String, //进程全名
-    val attached: Boolean //是否已经附加
-)
+import kotlinx.serialization.Serializable
 
 /**
  * sql执行消息
  */
+@Serializable
 data class SqlMessage(
     val pid: String,
     val sql: String,

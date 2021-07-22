@@ -1,16 +1,10 @@
 package xyz.thetbw.monitor.jdbc.agent
-import io.ktor.client.*
-import io.ktor.client.engine.cio.*
-import io.ktor.client.features.websocket.*
-import io.ktor.http.*
-import io.ktor.http.cio.websocket.*
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+
 import mu.KotlinLogging
 import org.java_websocket.client.WebSocketClient
-import org.java_websocket.drafts.Draft
 import org.java_websocket.handshake.ServerHandshake
 import java.net.URI
+import kotlin.concurrent.thread
 
 /**
  * 负责和server之间的连接
@@ -28,30 +22,54 @@ object Client {
     }
 
     fun sendMessage(message: SqlMessage){
+        if (client.isClosing || client.isClosed){
+            return
+        }
         if (client.isOpen){
             client.send(message.toJson())
         }else{
-            logger.warn { "client还未连接" }
+            logger.warn { "未连接到server" }
         }
-
     }
+
+    fun reset(){
+        client.closeBlocking()
+    }
+
 }
 
 private class SocketClient(uri: URI): WebSocketClient(uri) {
+    private var failureTimes: Int = 0
+
     override fun onOpen(handshakedata: ServerHandshake?) {
         logger.info { "websocket连接成功" }
     }
 
     override fun onMessage(message: String?) {
-        logger.info { "收到消息:$message" }
+        logger.info { "收到来自服务器的消息:$message" }
+        if (message == "exit"){
+            exit()
+        }
     }
 
     override fun onClose(code: Int, reason: String?, remote: Boolean) {
         logger.info { "连接已关闭" }
+        exit()
     }
 
     override fun onError(ex: java.lang.Exception?) {
-        logger.info (ex){ "websocket连接失败" }
+        logger.info (ex){ "websocket连接失败,尝试重新连接" }
+        failureTimes++
+        if (failureTimes < 5){
+            logger.warn { "1s后尝试重新连接" }
+            thread(start = true) {
+                Thread.sleep(1000)
+                this.reconnect()
+            }
+        }else{
+            logger.error { "超过重试次数，关闭当前 agent" }
+            exit()
+        }
     }
 
 }
