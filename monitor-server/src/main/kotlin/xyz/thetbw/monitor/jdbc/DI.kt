@@ -6,7 +6,7 @@ import org.kodein.di.singleton
 import xyz.thetbw.monitor.jdbc.service.AgentService
 import xyz.thetbw.monitor.jdbc.service.LogService
 
-val di = DI{
+val di = DI {
     bind<AgentService>() with singleton { AgentService() }
     bind<LogService>() with singleton { LogService() }
 }

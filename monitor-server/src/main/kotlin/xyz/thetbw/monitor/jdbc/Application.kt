@@ -12,7 +12,7 @@ import java.net.URI
 import java.net.URL
 import java.net.URLClassLoader
 
-val logger = KotlinLogging.logger {  }
+val logger = KotlinLogging.logger { }
 
 fun main() {
     loadToolsJar()
@@ -25,36 +25,38 @@ fun main() {
     try {
         logger.info { "尝试打开浏览器" }
         Desktop.getDesktop().browse(URI.create("http://127.0.0.1:10086/"))
-    }catch (e: Exception){
+    } catch (e: Exception) {
         logger.error(e) { "浏览器打开失败" }
     }
 }
 
 //手动加载 toots.jar
-fun loadToolsJar(){
+fun loadToolsJar() {
     try {
         logger.info { "尝试手动加载 tools.jar" }
         val javaHome = System.getProperty("java.home")
         logger.info { "当前java_home: $javaHome" }
         var libDir = File(javaHome)
-        if (javaHome.endsWith("jre")){
+        if (javaHome.endsWith("jre")) {
             libDir = libDir.parentFile
         }
-        libDir = File(libDir,"lib")
-        if (!libDir.exists()){
+        libDir = File(libDir, "lib")
+        if (!libDir.exists()) {
             error("查到tools.jar 失败，当前目录：${libDir.path}")
         }
-        val jar = File(libDir,"tools.jar")
-        if (!libDir.exists()){
+        val jar = File(libDir, "tools.jar")
+        if (!libDir.exists()) {
             error("查到tools.jar 失败，当前目录：${libDir.path}")
         }
         logger.info { "开始加载jar: ${jar.path}" }
         val loader = ClassLoader.getSystemClassLoader() as URLClassLoader
         val method = URLClassLoader::class.java.getDeclaredMethod("addURL", URL::class.java)
         method.isAccessible = true
-        method.invoke(loader,jar.toURI().toURL())
-    }catch (e: Exception){
-        logger.error(e) { "加载 tools.jar失败，请检查当前 jvm版本，" +
-                "或者通过启动时给定参数 '-Xbootclasspath/a:<jarpath>' 来手动加载" }
+        method.invoke(loader, jar.toURI().toURL())
+    } catch (e: Exception) {
+        logger.error(e) {
+            "加载 tools.jar失败，请检查当前 jvm版本，" +
+                    "或者通过启动时给定参数 '-Xbootclasspath/a:<jarpath>' 来手动加载"
+        }
     }
 }

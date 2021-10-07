@@ -11,12 +11,12 @@ import xyz.thetbw.monitor.jdbc.*
 import xyz.thetbw.monitor.jdbc.service.AgentService
 import xyz.thetbw.monitor.jdbc.service.LogService
 
-fun Route.mainApi(){
-    val logger  =KotlinLogging.logger {  }
+fun Route.mainApi() {
+    val logger = KotlinLogging.logger { }
     val agentService: AgentService by di.instance()
     val logService: LogService by di.instance()
 
-    route("/process"){
+    route("/process") {
 
         //获取当前所有java进程
         get {
@@ -28,9 +28,9 @@ fun Route.mainApi(){
             call.respond(ApiResult(current))
         }
     }
-    webSocket ("/log/reader/{pid}"){
+    webSocket("/log/reader/{pid}") {
         logger.info { "一个新客户端连接" }
-        send(SqlMessage("0","连接成功",0,0,0).toJson())
+        send(SqlMessage("0", "连接成功", 0, 0, 0).toJson())
         logService.registerConsumers(this)
         for (frame in incoming) {
             when (frame) {
@@ -59,7 +59,7 @@ fun Route.mainApi(){
                     else -> logger.warn { "不支持的消息类型" }
                 }
             }
-        }catch (e:Exception){
+        } catch (e: Exception) {
             e.printStackTrace()
         }
     }

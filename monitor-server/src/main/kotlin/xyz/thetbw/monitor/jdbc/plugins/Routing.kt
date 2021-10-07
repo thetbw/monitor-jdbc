@@ -10,26 +10,26 @@ import xyz.thetbw.monitor.jdbc.api.mainApi
 
 fun Application.configureRouting() {
 
-    install(CORS){
+    install(CORS) {
         host("*")
     }
 
-    install(StatusPages){
+    install(StatusPages) {
         exception<Throwable> {
             it.printStackTrace()
             val message = it.message ?: "接口异常"
-            call.respond(ApiResult<String>(false,message))
+            call.respond(ApiResult<String>(false, message))
         }
     }
 
-    install(Routing){
-        route("/api"){
+    install(Routing) {
+        route("/api") {
             mainApi();
         }
         get("/") {
             call.respondRedirect("/index.html")
         }
-        get ("/index"){
+        get("/index") {
             call.respondRedirect("/index.html")
         }
         // Static feature. Try to access `/static/index.html`

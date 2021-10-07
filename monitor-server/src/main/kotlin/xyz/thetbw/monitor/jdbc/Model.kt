@@ -27,17 +27,17 @@ data class SqlMessage(
 
 @Serializable
 @Suppress("unused")
-data class ApiResult<T: Any>(val success: Boolean){
+data class ApiResult<T : Any>(val success: Boolean) {
 
     var body: T? = null
 
     var msg: String? = null
 
-    constructor(success: Boolean,msg: String) : this(success){
+    constructor(success: Boolean, msg: String) : this(success) {
         this.msg = msg
     }
 
-    constructor(body: T): this(true){
+    constructor(body: T) : this(true) {
         this.body = body
     }
 }

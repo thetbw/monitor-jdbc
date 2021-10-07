@@ -8,6 +8,6 @@ inline fun <reified T> T.toJson() = Json.encodeToString(this)
 
 inline fun <reified T> String.fromJson() = Json.decodeFromString<T>(this)
 
-fun error(msg: String){
+fun error(msg: String) {
     throw RuntimeException(msg)
 }

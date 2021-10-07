@@ -8,20 +8,20 @@ import xyz.thetbw.monitor.jdbc.toJson
 class LogService {
     private val consumers = ArrayList<DefaultWebSocketServerSession>()
 
-    fun registerConsumers(consumer: DefaultWebSocketServerSession){
-        synchronized(consumers){
+    fun registerConsumers(consumer: DefaultWebSocketServerSession) {
+        synchronized(consumers) {
             consumers.add(consumer)
         }
     }
 
-    fun unregister(consumer: DefaultWebSocketServerSession){
+    fun unregister(consumer: DefaultWebSocketServerSession) {
         consumers.remove(consumer)
     }
 
-    suspend fun onMessage(message: SqlMessage){
-        consumers.forEach{
+    suspend fun onMessage(message: SqlMessage) {
+        consumers.forEach {
             val pid = it.call.parameters["pid"]
-            if (pid == message.pid){
+            if (pid == message.pid) {
                 it.outgoing.send(Frame.Text(message.toJson()))
             }
 

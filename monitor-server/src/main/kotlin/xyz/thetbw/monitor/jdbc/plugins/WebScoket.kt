@@ -5,7 +5,7 @@ import io.ktor.http.cio.websocket.*
 import io.ktor.websocket.*
 import java.time.Duration
 
-fun Application.configureWebSocket(){
+fun Application.configureWebSocket() {
     install(WebSockets) {
         pingPeriod = Duration.ofSeconds(60) // Disabled (null) by default
         timeout = Duration.ofSeconds(15)

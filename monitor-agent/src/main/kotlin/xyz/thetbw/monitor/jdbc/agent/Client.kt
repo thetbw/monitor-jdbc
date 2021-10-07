@@ -1,6 +1,5 @@
 package xyz.thetbw.monitor.jdbc.agent
 
-import mu.KotlinLogging
 import org.java_websocket.client.WebSocketClient
 import org.java_websocket.handshake.ServerHandshake
 import java.net.URI
@@ -11,34 +10,34 @@ import kotlin.concurrent.thread
  */
 object Client {
 
-    private val logger  =KotlinLogging.logger {  }
+    private val logger = Logger.getLogger { }
     private lateinit var client: WebSocketClient
 
     /** 初始化socket连接 */
-    fun init(){
+    fun init() {
         logger.info { "开始连接服务器" }
         client = SocketClient(URI("http://localhost:10086/api/log/producer"))
         client.connect()
     }
 
-    fun sendMessage(message: SqlMessage){
-        if (client.isClosing || client.isClosed){
+    fun sendMessage(message: SqlMessage) {
+        if (client.isClosing || client.isClosed) {
             return
         }
-        if (client.isOpen){
+        if (client.isOpen) {
             client.send(message.toJson())
-        }else{
+        } else {
             logger.warn { "未连接到server" }
         }
     }
 
-    fun reset(){
+    fun reset() {
         client.closeBlocking()
     }
 
 }
 
-private class SocketClient(uri: URI): WebSocketClient(uri) {
+private class SocketClient(uri: URI) : WebSocketClient(uri) {
     private var failureTimes: Int = 0
 
     override fun onOpen(handshakedata: ServerHandshake?) {
@@ -47,7 +46,7 @@ private class SocketClient(uri: URI): WebSocketClient(uri) {
 
     override fun onMessage(message: String?) {
         logger.info { "收到来自服务器的消息:$message" }
-        if (message == "exit"){
+        if (message == "exit") {
             exit()
         }
     }
@@ -58,15 +57,19 @@ private class SocketClient(uri: URI): WebSocketClient(uri) {
     }
 
     override fun onError(ex: java.lang.Exception?) {
-        logger.info (ex){ "websocket连接失败,尝试重新连接" }
+        if (ex != null) {
+            logger.warn(ex) { "websocket连接失败,尝试重新连接" }
+        } else {
+            logger.warn { "websocket连接失败,尝试重新连接" }
+        }
         failureTimes++
-        if (failureTimes < 5){
+        if (failureTimes < 5) {
             logger.warn { "1s后尝试重新连接" }
             thread(start = true) {
                 Thread.sleep(1000)
                 this.reconnect()
             }
-        }else{
+        } else {
             logger.error { "超过重试次数，关闭当前 agent" }
             exit()
         }

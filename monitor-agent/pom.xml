@@ -26,32 +26,42 @@
             <artifactId>Java-WebSocket</artifactId>
             <version>1.5.1</version>
         </dependency>
+
+        <!--  弃用，换用byte buddy       -->
         <dependency>
             <groupId>org.javassist</groupId>
             <artifactId>javassist</artifactId>
             <version>3.28.0-GA</version>
         </dependency>
+
+
+<!--        <dependency>-->
+<!--            <groupId>net.bytebuddy</groupId>-->
+<!--            <artifactId>byte-buddy</artifactId>-->
+<!--            <version>1.11.15</version>-->
+<!--        </dependency>-->
+
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-stdlib-jdk8</artifactId>
             <version>1.2.71</version>
         </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-simple</artifactId>
-            <version>1.7.29</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.slf4j</groupId>-->
+<!--            <artifactId>slf4j-simple</artifactId>-->
+<!--            <version>1.7.29</version>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-reflect</artifactId>
             <version>${kotlin.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>io.github.microutils</groupId>
-            <artifactId>kotlin-logging</artifactId>
-            <version>1.12.5</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>io.github.microutils</groupId>-->
+<!--            <artifactId>kotlin-logging</artifactId>-->
+<!--            <version>1.12.5</version>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>org.jetbrains.kotlinx</groupId>
             <artifactId>kotlinx-coroutines-core</artifactId>
@@ -62,6 +72,13 @@
             <artifactId>kotlin-stdlib</artifactId>
             <version>${kotlin.version}</version>
             <scope>compile</scope>
+        </dependency>
+
+        <!--  用于反编译java代码       -->
+        <dependency>
+            <groupId>org.benf</groupId>
+            <artifactId>cfr</artifactId>
+            <version>0.151</version>
         </dependency>
     </dependencies>
 
@@ -112,6 +129,7 @@
                             <Can-Retransform-Classes>true</Can-Retransform-Classes>
                             <Can-Redefine-Classes>true</Can-Redefine-Classes>
                             <Agent-Class>xyz.thetbw.monitor.jdbc.agent.MainAgentKt</Agent-Class>
+                            <Premain-Class>xyz.thetbw.monitor.jdbc.agent.MainAgentKt</Premain-Class>
                         </manifestEntries>
                     </archive>
                 </configuration>
