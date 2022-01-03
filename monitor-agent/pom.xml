@@ -13,6 +13,7 @@
         <maven.compiler.target>8</maven.compiler.target>
         <kotlin.version>1.5.0</kotlin.version>
         <serialization.version>1.2.2</serialization.version>
+        <main.class>xyz.thetbw.monitor.jdbc.agent.MainAgentKt</main.class>
     </properties>
 
     <dependencies>
@@ -80,6 +81,17 @@
             <artifactId>cfr</artifactId>
             <version>0.151</version>
         </dependency>
+
+        <dependency>
+            <groupId>com.xenomachina</groupId>
+            <artifactId>kotlin-argparser</artifactId>
+            <version>2.0.7</version>
+        </dependency>
+        <dependency>
+            <groupId>xyz.thetbw</groupId>
+            <artifactId>monitor-server</artifactId>
+            <version>0.0.2</version>
+        </dependency>
     </dependencies>
 
 
@@ -124,12 +136,13 @@
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
+                            <mainClass>${main.class}</mainClass>
                         </manifest>
                         <manifestEntries>
                             <Can-Retransform-Classes>true</Can-Retransform-Classes>
                             <Can-Redefine-Classes>true</Can-Redefine-Classes>
-                            <Agent-Class>xyz.thetbw.monitor.jdbc.agent.MainAgentKt</Agent-Class>
-                            <Premain-Class>xyz.thetbw.monitor.jdbc.agent.MainAgentKt</Premain-Class>
+                            <Agent-Class>${main.class}</Agent-Class>
+                            <Premain-Class>${main.class}</Premain-Class>
                         </manifestEntries>
                     </archive>
                 </configuration>
@@ -142,6 +155,21 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.2.1</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <mainClass>${main.class}</mainClass>
+                </configuration>
             </plugin>
         </plugins>
     </build>

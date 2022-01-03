@@ -20,7 +20,11 @@ fun Route.mainApi() {
 
         //获取当前所有java进程
         get {
-            call.respond(ApiResult(agentService.listProcess()))
+            if (STANDALONE_MODE){
+                call.respond(ApiResult(agentService.listProcess()))
+            }else{
+                call.respond(ApiResult("inner_mode"))
+            }
         }
         get("/attach") {
             val pid = call.request.queryParameters["pid"]

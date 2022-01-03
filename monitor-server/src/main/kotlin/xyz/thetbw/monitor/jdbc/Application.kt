@@ -11,22 +11,40 @@ import java.io.File
 import java.net.URI
 import java.net.URL
 import java.net.URLClassLoader
+import java.net.URLDecoder
+
+
+private class CLAZZ
+
 
 val logger = KotlinLogging.logger { }
+var STANDALONE_MODE = false
+var AGENT_JAR_PATH: String? = null
 
-fun main() {
-    loadToolsJar()
+fun lunch(standaloneMode: Boolean) {
+    STANDALONE_MODE = standaloneMode
+
+    if (STANDALONE_MODE) {
+        loadToolsJar()
+        //开始获取执行的jar包
+        val path: String = CLAZZ::class.java.protectionDomain.codeSource.location.path
+        val decodedPath = URLDecoder.decode(path, "UTF-8")
+        println("decodedpath:$decodedPath")
+
+    }
     embeddedServer(Netty, port = 10086, host = "127.0.0.1") {
         configureWebSocket()
         configureRouting()
         configureSerialization()
     }.start(wait = false)
     logger.info { "web server启动成功" }
-    try {
-        logger.info { "尝试打开浏览器" }
-        Desktop.getDesktop().browse(URI.create("http://127.0.0.1:10086/"))
-    } catch (e: Exception) {
-        logger.error(e) { "浏览器打开失败" }
+    if (STANDALONE_MODE) {
+        try {
+            logger.info { "尝试打开浏览器" }
+            Desktop.getDesktop().browse(URI.create("http://127.0.0.1:10086/"))
+        } catch (e: Exception) {
+            logger.error(e) { "浏览器打开失败" }
+        }
     }
 }
 

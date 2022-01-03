@@ -1,5 +1,6 @@
 package xyz.thetbw.monitor.jdbc.agent
 
+import xyz.thetbw.monitor.jdbc.lunch
 import java.lang.instrument.Instrumentation
 import java.lang.management.ManagementFactory
 
@@ -16,16 +17,32 @@ fun agentmain(agentArgs: String?, inst: Instrumentation) {
     start(agentArgs, inst, MODE_AGENTMAIN)
 }
 
+var STANDALONE_MODE = false
+
+fun main() {
+    lunch(true)
+}
+
 fun start(agentArgs: String?, inst: Instrumentation, mode: String) {
-    Logger.level = Logger.Level.DEBUG
+    if (agentArgs?.contains("debug") == true) {
+        Logger.level = Logger.Level.DEBUG
+    }
+
     logger.println { "---------- monitor agent 开始加载 -----------" }
     logger.println { "当前启动模式为:$mode" }
-
+    if (mode == MODE_PREMAIN) {
+        lunchServer()
+    }
     val pid = getCurrentPid()
     logger.info { "当前进程id为：$pid" }
     Client.init()
     Monitor.classProcess(inst)
     logger.println { "---------- monitor agent 加载成功 -----------" }
+}
+
+fun lunchServer() {
+    logger.info { "开始启动agentServer" }
+    lunch(false)
 }
 
 fun getCurrentPid(): String {

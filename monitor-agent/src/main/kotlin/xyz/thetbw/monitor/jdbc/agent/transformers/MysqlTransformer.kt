@@ -90,7 +90,11 @@ class MysqlTransformer : JdbcTransformer() {
                 execMethod("getIntegerProperty", propertySet, "maxQuerySizeToLog", String::class.java)!!
 
             //开始解码sql
-            val queryPosition = execMethod("getTag", queryPackage, "QUERY") as Int
+            val queryPosition = try {
+                execMethod("getTag", queryPackage, "QUERY") as Int
+            } catch (e: Exception) {
+                1
+            }
             val oldPacketPosition = execMethod("getPosition", queryPackage, null) as Int
             val maxQuerySizeToLogValue = execMethod("getValue", maxQuerySizeToLog, null) as Int
             val truncated: Boolean = oldPacketPosition - queryPosition > maxQuerySizeToLogValue
@@ -106,15 +110,16 @@ class MysqlTransformer : JdbcTransformer() {
             val byteBuffer = getFieldValue("byteBuffer", queryPackage) as ByteArray
 //            val realSql = String(byteBuffer, 5,byteBuffer.size-5)
             //出去 queryPackage多余的部分
-            val realSql = getSql(byteBuffer)
+            val realSql = getSql(byteBuffer.clone())
             Monitor.saveRecord(realSql, startTime, endTime)
         }
 
         /** 将packet byte 转换为 sql字符串 */
         private fun getSql(sqlByte: ByteArray): String {
+            val byteData = sqlByte.clone()
             var beginIndex = -1
             var endIndex = -1
-            for ((index, byte) in sqlByte.withIndex()) {
+            for ((index, byte) in byteData.withIndex()) {
                 val byteInt = byte.toInt()
                 if (beginIndex == -1 && byte in 48..122) {
                     beginIndex = index
@@ -123,12 +128,12 @@ class MysqlTransformer : JdbcTransformer() {
                     endIndex = index
                 }
                 if (byteInt == 0x0A || byteInt == 0x09 || byteInt == 0x0D) {
-                    sqlByte[index] = 0x20
+                    byteData[index] = 0x20
                 }
             }
-            if (endIndex == -1) endIndex = sqlByte.size
+            if (endIndex == -1) endIndex = byteData.size
             if (beginIndex == -1) beginIndex = 0
-            return String(sqlByte, beginIndex, endIndex - beginIndex)
+            return String(byteData, beginIndex, endIndex - beginIndex)
         }
 
 
@@ -151,7 +156,7 @@ class MysqlTransformer : JdbcTransformer() {
             return try {
                 obj.getDeclaredField(name)
             } catch (e: Exception) {
-                logger.warn { "从 ${obj.canonicalName} 获取属性 ${name} 失败，尝试从父类获取" }
+                logger.debug { "从 ${obj.canonicalName} 获取属性 ${name} 失败，尝试从父类获取" }
                 getField(name, obj.superclass)
             }
         }
@@ -175,7 +180,7 @@ class MysqlTransformer : JdbcTransformer() {
                     method.invoke(obj, args)
                 }
             } catch (e: Exception) {
-                logger.error { "当前方法: $method " }
+                logger.debug { "当前方法: $method " }
                 throw e
             }
 
@@ -190,13 +195,13 @@ class MysqlTransformer : JdbcTransformer() {
                     obj.getMethod(name, *argTypes)
                 }
             } catch (e: Exception) {
-                logger.warn { "从 ${obj.canonicalName} 获取方法 ${name} 失败，尝试使用methods直接获取" }
+                logger.debug { "从 ${obj.canonicalName} 获取方法 ${name} 失败，尝试使用methods直接获取" }
                 for (method in obj.methods) {
                     if (method.name.equals(name)) {
                         return method
                     }
                 }
-                logger.warn { "从 ${obj.canonicalName} 获取方法 ${name} 失败，尝试从父类获取" }
+                logger.debug { "从 ${obj.canonicalName} 获取方法 ${name} 失败，尝试从父类获取" }
                 getMethod(name, obj.superclass)
             }
         }

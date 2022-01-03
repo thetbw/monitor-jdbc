@@ -54,8 +54,19 @@ export default {
                 url:"/api/process",
                 method:"GET"
             }).then(data=>{
-                this.processSelectShow = true
-                this.process = data
+                if (data == "inner_mode"){
+                  this.openWebSocket(0)
+                  this.currentProcess = {
+                      pid:0,
+                      name:"内部模式",
+                      fullName:"内部模式",
+                      attached:true
+                  }
+                  this.processSelectShow = false
+                }else {
+                  this.processSelectShow = true
+                  this.process = data
+                }
             })
         },
         //附加到目标进程
