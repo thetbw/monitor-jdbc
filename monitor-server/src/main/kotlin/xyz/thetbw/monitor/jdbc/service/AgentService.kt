@@ -2,6 +2,7 @@ package xyz.thetbw.monitor.jdbc.service
 
 import com.sun.tools.attach.VirtualMachine
 import mu.KotlinLogging
+import xyz.thetbw.monitor.jdbc.CURRENT_PATH
 import xyz.thetbw.monitor.jdbc.JavaProcess
 import java.io.File
 import java.io.FileOutputStream
@@ -13,8 +14,6 @@ class AgentService {
 
     private val attachVms = HashSet<String>() //已经连接的vm
 
-    /** agent的jar包路径 */
-    private var agentPath = lazy { unzipAgentJar() }
 
     /**
      * 获取java进程列表
@@ -59,11 +58,10 @@ class AgentService {
         if (currentVMVersion != targetVMVersion) {
             error("当前虚拟机版本($currentVMVersion)和目标虚拟机版本不一致($targetVMVersion)")
         }
-        val agentPath = agentPath.value
-        logger.info { "开始加载agent,当前agent地址为:$agentPath" }
+        logger.info { "开始加载agent,当前agent地址为:$CURRENT_PATH" }
         try {
             logger.info { "当前 pid 为: $pid" }
-            vm.loadAgent(agentPath)
+            vm.loadAgent(CURRENT_PATH)
             attachVms.add(pid)
         } catch (e: Exception) {
             if (e.message == "0") {

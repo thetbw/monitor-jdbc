@@ -16,7 +16,7 @@ import java.net.URLDecoder
 
 private class CLAZZ
 
-
+lateinit var CURRENT_PATH:String
 val logger = KotlinLogging.logger { }
 var STANDALONE_MODE = false
 var AGENT_JAR_PATH: String? = null
@@ -29,7 +29,7 @@ fun lunch(standaloneMode: Boolean) {
         //开始获取执行的jar包
         val path: String = CLAZZ::class.java.protectionDomain.codeSource.location.path
         val decodedPath = URLDecoder.decode(path, "UTF-8")
-        println("decodedpath:$decodedPath")
+        CURRENT_PATH = decodedPath.substring(1)
 
     }
     embeddedServer(Netty, port = 10086, host = "127.0.0.1") {
